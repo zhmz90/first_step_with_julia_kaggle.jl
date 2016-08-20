@@ -6,12 +6,13 @@ import numpy as np
 import pandas as pd
 
 def read_data(typeData, labelsInfo, imageSize, path):
-  x = np.zeros((labelsInfo.shape[0], 20, 20, 3))
+  x = np.zeros((labelsInfo.shape[0], 3, 20, 20))
   for (index, idImage) in enumerate(labelsInfo["ID"]):
     nameFile = "{0}/{1}Resized/{2}.Bmp".format(path, typeData, idImage)
     img = imread(nameFile, as_grey=False)
+    print(img.shape)
     #print(len(img.ravel()))
-    x[index, :] = np.reshape(img.ravel(), (20, 20, -1))
+    x[index, :] = np.reshape(img.ravel(), (-1, 20, 20))
   return x
 
 
