@@ -6,3 +6,7 @@
 *.gz
 *.jld
 *.jl~
+*.pickle
+*.csv
+*.hdf5
+*.h5
