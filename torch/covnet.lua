@@ -2,7 +2,6 @@ require "hdf5"
 require "nn"
 require "cunn"
 
-
 local batch_size = 256
 
 -- Model
@@ -22,7 +21,7 @@ net:add(nn.Linear(128*5*5, 120))             -- fully connected layer (matrix mu
 net:add(nn.ReLU())                       -- non-linearity 
 net:add(nn.Linear(120, 84))
 net:add(nn.ReLU())                       -- non-linearity 
-net:add(nn.Linear(84, 62))                   -- 62 classes
+net:add(nn.Linear(84, 70))                   -- 62 classes
 net:add(nn.LogSoftMax())
 
 -- Criterion
@@ -41,9 +40,13 @@ end
 }
 );
 
-function trainset:size() 
-    return self.data:size(1) 
+function trainset:size()
+    return self.data:size(1)
 end
+print("yTr min max")
+print(torch.min(yTr))
+print(torch.max(yTr))
+
 
 -- Optimization
 trainer = nn.StochasticGradient(net, criterion)
@@ -55,22 +58,18 @@ trainer:train(trainset)
 for i = 1,2500 do
   -- random sample
   local input= XTr;     -- normally distributed example in 2d
-  local output= torch.Tensor(1);
-  if input[1]*input[2] > 0 then  -- calculate label for XOR function
-    output[1] = -1
-  else
-    output[1] = 1
-  end
+  local output= yTr;
 
   -- feed it to the neural network and the criterion
-  criterion:forward(mlp:forward(input), output)
+  criterion:forward(net:forward(input), output)
 
   -- train over this example in 3 steps
   -- (1) zero the accumulation of the gradients
-  mlp:zeroGradParameters()
+  net:zeroGradParameters()
   -- (2) accumulate gradients
-  mlp:backward(input, criterion:backward(mlp.output, output))
+  net:backward(input, criterion:backward(net.output, output))
   -- (3) update parameters with a 0.01 learning rate
-  mlp:updateParameters(0.01)
+  net:updateParameters(0.01)
 end
+
 --]]
